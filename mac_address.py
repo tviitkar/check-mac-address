@@ -2,6 +2,8 @@ import re
 import requests
 from flask import Flask, jsonify
 
+# todo - could move these two separate configuration file
+SYMBOLS_TO_REMOVE = "[.:]"  # easy to update, for example add dash (-)
 MAC_ADDRESS_BIT_LENGTH = 48  # mac addresses consist of 48 bits
 MAC_FORMATS = {0: None, 2: ":", 4: "."}  # key represents group size, value represents group separator
 
@@ -14,7 +16,7 @@ def verify_mac_address(address):
     mac_vendor = ""
     
     # remove group separators (dot, semicolon, dash, etc)
-    address_no_grouping = re.sub('[.:]', "", address)  # substitute can be easily updated
+    address_no_grouping = re.sub(SYMBOLS_TO_REMOVE, "", address)  # substitute can be easily updated
 
     response = "NOK"  # default assumption is that input value is invalid
     if len(address_no_grouping) == 12:  # mac addresses are 12 character in length
@@ -57,4 +59,4 @@ def verify_mac_address(address):
                     "vendor": mac_vendor})  
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
