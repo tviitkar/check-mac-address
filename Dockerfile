@@ -5,16 +5,16 @@ LABEL MAINTAINER="Tambet Viitkar"
 LABEL description="Für Elisa - Mac Address Verifier"
 
 # Working directory
-WORKDIR /python_mac
+WORKDIR /python_script
 
 # Copy dependencies to the image
-COPY ./requirements.txt /python_mac/requirements.txt
+COPY ./python/requirements.txt /python_script/requirements.txt
 
 # Install (solve) Python dependencies
 RUN pip install -r requirements.txt
 
 # Copy all files from local working folder to the image
-COPY . /python_mac
+COPY ./python /python_script
 
 # Flask is set to run on port 5000 in the script
 # Therefor I probably don't need this
@@ -25,4 +25,4 @@ COPY . /python_mac
 ENTRYPOINT ["python3"]
 
 # Run Python script
-CMD ["mac_address.py"]
+CMD ["mac_verifier.py"]

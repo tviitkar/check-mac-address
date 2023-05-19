@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  tasks:
+    # Build image
+    - name: Build image for MAC address verifier
+      community.docker.docker_image:
+        name: verify_mac_address
+        source: build
+        build:
+          path: ..  # go to project root folder, Dockerfile is there
+    # Deploy image and run the microservice
+    - name: Depoloy MAC address verifier
+      community.docker.docker_container:
+        name: verify_mac_address
+        image: verify_mac_address:latest
+        state: started  # start the container automatically
+        # auto_remove: true  # remove the container once it stops
+        ports:
+          - "5001:5000"
