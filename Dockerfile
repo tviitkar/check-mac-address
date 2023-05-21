@@ -4,25 +4,25 @@ FROM python:3.11-alpine3.18
 LABEL MAINTAINER="Tambet Viitkar"
 LABEL description="Für Elisa - Mac Address Verifier"
 
-# Working directory
-WORKDIR /python_script
+# Set working directory
+WORKDIR /app
 
-# Copy dependencies to the image
-COPY ./python/requirements.txt /python_script/requirements.txt
-
-# Install (solve) Python dependencies
+# Copy Python requirements to image and solve dependencies
+COPY ./python/requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy all files from local working folder to the image
-COPY ./python /python_script
+COPY ./python /app
 
-# Flask is set to run on port 5000 in the script
-# Therefor I probably don't need this
-# Keeping it here for reference (for now)
-# EXPOSE 5000
+# Update packages, install Prometheus and create configuration file
+RUN apk update && apk upgrade --no-cache
+RUN apk add prometheus prometheus-node-exporter
+COPY /misc/prometheus.yml /etc/prometheus/
 
-# Executable that will run after the container is initiated
-ENTRYPOINT ["python3"]
+# Copy services script to image and make it executable
+COPY ./misc/run_services.sh /app/run_services.sh
+RUN chmod +x /app/run_services.sh
 
-# Run Python script
-CMD ["mac_verifier.py"]
+# Run the services script that start Flask and Prometheus
+ENTRYPOINT ["/bin/sh"]
+CMD ["/app/run_services.sh"]
